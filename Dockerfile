@@ -75,7 +75,7 @@ RUN { \
     echo "TraceEnable off"; \
   } >> /etc/apache2/apache2.conf
 
-RUN alias wpr='wp --allow-root' \
-    && wpr core install 
+# RUN alias wpr='wp --allow-root' \
+#     && wpr core install 
 
 VOLUME /var/www/html
