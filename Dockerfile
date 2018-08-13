@@ -13,8 +13,13 @@ RUN a2enmod rewrite \
   && a2enmod headers
 
 # install the PHP extensions we need
-RUN apt-get update \
-  && apt-get install -y libpng12-dev libjpeg-dev libxml2-dev libxslt-dev libgraphicsmagick1-dev graphicsmagick \
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libxml2-dev \
+    libxslt-dev \
+    libgraphicsmagick1-dev \
+    graphicsmagick \
   && rm -rf /var/lib/apt/lists/* \
   && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
   && docker-php-ext-install gd json mysqli pdo pdo_mysql opcache gettext exif calendar soap xsl sockets wddx
@@ -69,5 +74,8 @@ RUN { \
     echo "ServerTokens Prod"; \
     echo "TraceEnable off"; \
   } >> /etc/apache2/apache2.conf
+
+RUN alias wpr='wp --allow-root' \
+    && wpr core install 
 
 VOLUME /var/www/html
