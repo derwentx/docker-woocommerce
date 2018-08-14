@@ -68,10 +68,12 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 
             # Set up woocommerce
             as_web_user "wp wc tool run install_pages --user=\"$WORDPRESS_ADMIN_USER\""
+            # Correct permalinks for api
+            as_web_user "wp rewrite structure '/%postname%/'"
             # Creates the woocommerce_api_keys table if it doesn't exist
 
             if [ -n $WOOCOMMERCE_CONSUMER_KEY ] && [ -n $WOOCOMMERCE_CONSUMER_SECRET ]; then
-
+                as_web_user "wp option update woocommerce_api_enabled yes"
                 as_web_user "wp eval \"WC_Install::install();\""
 
                 as_web_user "wp eval '
@@ -88,9 +90,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
                         array( \"%d\", \"%s\", \"%s\",\"%s\",\"%s\", ) 
                     );'"
             fi
-            
-
-
 
             if [ -n "$WOOCOMMERCE_TEST_DATA" ] && [ ! -f "sample_products.xml" ]; then
                 as_web_user "wp plugin install wordpress-importer --activate"
@@ -100,5 +99,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
         fi
     )
 fi
+
+touch .done
 
 exec "$@"
