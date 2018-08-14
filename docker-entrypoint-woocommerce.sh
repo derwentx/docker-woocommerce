@@ -24,6 +24,10 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
             WORDPRESS_ADMIN_USER
             WORDPRESS_ADMIN_PASSWORD
             WORDPRESS_ADMIN_EMAIL
+            WORDPRESS_ACTIVE_THEME
+            WOOCOMMERCE_TEST_DATA
+            WOOCOMMERCE_CONSUMER_KEY
+            WOOCOMMERCE_CONSUMER_SECRET
         )
         haveConfig=
         for e in "${envs[@]}"; do
@@ -40,7 +44,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
             : "${WORDPRESS_ADMIN_USER:=admin}"
             : "${WORDPRESS_ADMIN_PASSWORD:=admin}"
             : "${WORDPRESS_ADMIN_EMAIL:=admin@example.com}"
-            : "${WORDPRESS_ACTIVE_THEME:=}"
             : "${SHELL:=/bin/sh}"
 
             # 
@@ -50,13 +53,44 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 
             # Run the wp commands as web-user
             # This part has some inspiration from https://github.com/autopilotpattern/wordpress/blob/master/bin/prestart.sh
-            as_web_user "wp core install --url=\"$WORDPRESS_SITE_URL\" --title=\"$WORDPRESS_SITE_TITLE\" --admin_user=\"$WORDPRESS_ADMIN_USER\" --admin_password=\"$WORDPRESS_ADMIN_PASSWORD\" --admin_email=\"$WORDPRESS_ADMIN_EMAIL\""
+            as_web_user "wp core install --url=\"$WORDPRESS_SITE_URL\" \
+              --title=\"$WORDPRESS_SITE_TITLE\" \
+              --admin_user=\"$WORDPRESS_ADMIN_USER\" \
+              --admin_password=\"$WORDPRESS_ADMIN_PASSWORD\" \
+              --admin_email=\"$WORDPRESS_ADMIN_EMAIL\" "
+
             if [ -n "$WORDPRESS_ACTIVE_THEME" ]; then
                 as_web_user "wp theme activate \"$WORDPRESS_ACTIVE_THEME\""
             fi
 
             # TODO: install plugins from env variable and ensure woocommerce
             as_web_user "wp plugin install woocommerce --activate"
+
+            # Set up woocommerce
+            as_web_user "wp wc tool run install_pages --user=\"$WORDPRESS_ADMIN_USER\""
+            # Creates the woocommerce_api_keys table if it doesn't exist
+
+            if [ -n $WOOCOMMERCE_CONSUMER_KEY ] && [ -n $WOOCOMMERCE_CONSUMER_SECRET ]; then
+
+                as_web_user "wp eval \"WC_Install::install();\""
+
+                as_web_user "wp eval '
+                    global \$wpdb; 
+                    echo \$wpdb->insert(
+                        \$wpdb->prefix . \"woocommerce_api_keys\", 
+                        array(
+                            \"user_id\"=>1, 
+                            \"permissions\"=>\"read_write\", 
+                            \"consumer_key\"=> wc_api_hash( \"$WOOCOMMERCE_CONSUMER_KEY\" ), 
+                            \"consumer_secret\"=> \"$WOOCOMMERCE_CONSUMER_SECRET\", 
+                            \"truncated_key\" => substr( \"$WOOCOMMERCE_CONSUMER_SECRET\", -7 ) 
+                        ), 
+                        array( \"%d\", \"%s\", \"%s\",\"%s\",\"%s\", ) 
+                    );'"
+            fi
+            
+
+
 
             if [ -n "$WOOCOMMERCE_TEST_DATA" ] && [ ! -f "sample_products.xml" ]; then
                 as_web_user "wp plugin install wordpress-importer --activate"
