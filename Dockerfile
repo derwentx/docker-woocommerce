@@ -1,12 +1,13 @@
 # Woocommerce Docker
 # PHP Docker for Woocommerce on Steroids
-#
+# Forked from https://github.com/julianxhokaxhiu/docker-woocommerce
+# 
 # VERSION 0.2
 
 FROM wordpress:php7.1-apache
-# TODO: Set these
-# MAINTAINER Julian Xhokaxhiu <info [at] julianxhokaxhiu [dot] com>
-# LABEL Description="PHP Docker for Woocommerce on Steroids" Vendor="Julian Xhokaxhiu" Version="0.2"
+MAINTAINER Derwent McElhinney <derwent [at] laserphile [dot] com>
+LABEL Description="PHP Docker for Woocommerce on Steroids" Vendor="Derwent McElhinney" Version="0.2"
+
 
 # enable extra Apache modules
 RUN a2enmod rewrite \
