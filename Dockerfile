@@ -91,18 +91,10 @@ RUN { \
     echo "TraceEnable off"; \
   } >> /etc/apache2/apache2.conf
 
-RUN set -ex; \
-    \
-    apt-get install less # required for wp-cli
+# Override docker-entrypoint.sh provided by wordpress
+COPY docker-entrypoint-woocommerce.sh /usr/local/bin/
+ENTRYPOINT ["docker-entrypoint-woocommerce.sh"]
 
-# USER www-data
-# RUN wp core download \
-#     && wp config create \
-#         --dbname="${WORDPRESS_DB_HOST:localhost}" \
-#         --dbuser="${WORDPRESS_DB_USER:wp}" \
-#         --dbpass="${WORDPRESS_DB_PASS}" \
-#         --dbprefix="${WORDPRESS_DB_PREFIX:wp_}" \
-#     && wp core install --url='http://localhost:8082/' --title='Api Test' --admin-user='test' --admin-password='test' --admin-email='test@example.com' --path .
-# USER root
+# Remove the line exec "$@" from docker-entrypoint.sh so it can be wrapped
+RUN sed -i $'s/^exec "$@"/# removed exec/g' /usr/local/bin/docker-entrypoint.sh
 
-VOLUME /var/www/html
