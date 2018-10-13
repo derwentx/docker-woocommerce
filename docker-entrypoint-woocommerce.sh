@@ -112,6 +112,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
                         as_web_user "wp post meta update $OAUTH_POST_ID callback \"$WORDPRESS_API_SECRET\""
                     fi
                 fi
+                rm oauth_add_out
             fi
 
             if [ -n "$WOOCOMMERCE_TEST_DATA" ] && [ ! -f "sample_products.xml" ]; then
