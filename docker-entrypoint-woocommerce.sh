@@ -69,7 +69,10 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 
             as_web_user "wp plugin install woocommerce --activate"
             if [ -n "$WORDPRESS_PLUGINS" ]; then
-                as_web_user "wp plugin install $WORDPRESS_PLUGINS --activate"
+                A_PLUGINS=( $WORDPRESS_PLUGINS )
+                for plugin in $A_PLUGINS; do
+                    as_web_user "wp plugin install $plugin --activate" || echo "could not install $plugin"
+                done
             fi
 
             # Set up woocommerce
