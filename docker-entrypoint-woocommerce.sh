@@ -46,7 +46,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
             : "${WORDPRESS_ADMIN_EMAIL:=admin@example.com}"
             : "${SHELL:=/bin/sh}"
 
-            # 
             as_web_user() {
                 su $user --shell $SHELL -c "$*"
             }
@@ -77,17 +76,17 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
                 as_web_user "wp eval \"WC_Install::install();\""
 
                 as_web_user "wp eval '
-                    global \$wpdb; 
+                    global \$wpdb;
                     echo \$wpdb->insert(
-                        \$wpdb->prefix . \"woocommerce_api_keys\", 
+                        \$wpdb->prefix . \"woocommerce_api_keys\",
                         array(
-                            \"user_id\"=>1, 
-                            \"permissions\"=>\"read_write\", 
-                            \"consumer_key\"=> wc_api_hash( \"$WOOCOMMERCE_CONSUMER_KEY\" ), 
-                            \"consumer_secret\"=> \"$WOOCOMMERCE_CONSUMER_SECRET\", 
-                            \"truncated_key\" => substr( \"$WOOCOMMERCE_CONSUMER_SECRET\", -7 ) 
-                        ), 
-                        array( \"%d\", \"%s\", \"%s\",\"%s\",\"%s\", ) 
+                            \"user_id\"=>1,
+                            \"permissions\"=>\"read_write\",
+                            \"consumer_key\"=> wc_api_hash( \"$WOOCOMMERCE_CONSUMER_KEY\" ),
+                            \"consumer_secret\"=> \"$WOOCOMMERCE_CONSUMER_SECRET\",
+                            \"truncated_key\" => substr( \"$WOOCOMMERCE_CONSUMER_SECRET\", -7 )
+                        ),
+                        array( \"%d\", \"%s\", \"%s\",\"%s\",\"%s\", )
                     );'"
             fi
 
