@@ -25,6 +25,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
             WORDPRESS_ADMIN_PASSWORD
             WORDPRESS_ADMIN_EMAIL
             WORDPRESS_ACTIVE_THEME
+            WORDPRESS_PLUGINS
             WOOCOMMERCE_TEST_DATA
             WOOCOMMERCE_CONSUMER_KEY
             WOOCOMMERCE_CONSUMER_SECRET
@@ -64,6 +65,9 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 
             # TODO: install plugins from env variable and ensure woocommerce
             as_web_user "wp plugin install woocommerce --activate"
+            if [ -n "$WORDPRESS_PLUGINS" ]; then
+                as_web_user "wp plugin install $WORDPRESS_PLUGINS --activate"
+            fi
 
             # Set up woocommerce
             as_web_user "wp wc tool run install_pages --user=\"$WORDPRESS_ADMIN_USER\""
