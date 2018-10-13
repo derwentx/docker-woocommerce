@@ -26,6 +26,8 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
             WORDPRESS_ADMIN_EMAIL
             WORDPRESS_ACTIVE_THEME
             WORDPRESS_PLUGINS
+            WORDPRESS_API_KEY
+            WORDPRESS_API_SECRET
             WOOCOMMERCE_TEST_DATA
             WOOCOMMERCE_CONSUMER_KEY
             WOOCOMMERCE_CONSUMER_SECRET
@@ -45,6 +47,8 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
             : "${WORDPRESS_ADMIN_USER:=admin}"
             : "${WORDPRESS_ADMIN_PASSWORD:=admin}"
             : "${WORDPRESS_ADMIN_EMAIL:=admin@example.com}"
+            : "${WORDPRESS_API_APPLICATION:=API Test Application}"
+            : "${WORDPRESS_API_DESCRIPTION:=Test key for Testing the WP API}"
             : "${SHELL:=/bin/sh}"
 
             as_web_user() {
@@ -63,7 +67,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
                 as_web_user "wp theme activate \"$WORDPRESS_ACTIVE_THEME\""
             fi
 
-            # TODO: install plugins from env variable and ensure woocommerce
             as_web_user "wp plugin install woocommerce --activate"
             if [ -n "$WORDPRESS_PLUGINS" ]; then
                 as_web_user "wp plugin install $WORDPRESS_PLUGINS --activate"
@@ -92,6 +95,23 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
                         ),
                         array( \"%d\", \"%s\", \"%s\",\"%s\",\"%s\", )
                     );'"
+            fi
+
+            if [ -n $WORDPRESS_API_KEY ] && [ -n $WORDPRESS_API_SECRET ]; then
+                as_web_user "wp plugin install rest-api rest-api-oauth1 --activate"
+                # capture the output of generating the oauth1 consumer
+                as_web_user "wp oauth1 add  --name=\"$WORDPRESS_API_APPLICATION\" --description=\"$WORDPRESS_API_DESCRIPTION\"" > oauth_add_out
+                OAUTH_POST_ID=$(awk '/^ID:/ {print $2}' oauth_add_out)
+                if [ ! -n $CONSUMER_POST_ID ]; then
+                    echo "could not determine post ID of oauth consumer."
+                    cat oauth_add_out
+                else
+                    as_web_user "wp post meta update $OAUTH_POST_ID key \"$WORDPRESS_API_KEY\""
+                    as_web_user "wp post meta update $OAUTH_POST_ID secret \"$WORDPRESS_API_SECRET\""
+                    if [ -n $WORDPRESS_API_CALLBACK ]; then
+                        as_web_user "wp post meta update $OAUTH_POST_ID callback \"$WORDPRESS_API_SECRET\""
+                    fi
+                fi
             fi
 
             if [ -n "$WOOCOMMERCE_TEST_DATA" ] && [ ! -f "sample_products.xml" ]; then
