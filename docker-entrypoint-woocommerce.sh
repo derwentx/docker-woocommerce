@@ -109,7 +109,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
                     as_web_user "wp post meta update $OAUTH_POST_ID key \"$WORDPRESS_API_KEY\""
                     as_web_user "wp post meta update $OAUTH_POST_ID secret \"$WORDPRESS_API_SECRET\""
                     if [ -n $WORDPRESS_API_CALLBACK ]; then
-                        as_web_user "wp post meta update $OAUTH_POST_ID callback \"$WORDPRESS_API_SECRET\""
+                        as_web_user "wp post meta update $OAUTH_POST_ID callback \"$WORDPRESS_API_CALLBACK\""
                     fi
                 fi
                 rm oauth_add_out
