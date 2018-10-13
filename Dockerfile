@@ -1,7 +1,7 @@
 # Woocommerce Docker
 # PHP Docker for Woocommerce on Steroids
 # Forked from https://github.com/julianxhokaxhiu/docker-woocommerce
-# 
+#
 # VERSION 0.2
 
 FROM wordpress:php7.1-apache
@@ -97,4 +97,3 @@ ENTRYPOINT ["docker-entrypoint-woocommerce.sh"]
 
 # Remove the line exec "$@" from docker-entrypoint.sh so it can be wrapped
 RUN sed -i $'s/^exec "$@"/# removed exec/g' /usr/local/bin/docker-entrypoint.sh
-

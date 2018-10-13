@@ -102,7 +102,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
                 # capture the output of generating the oauth1 consumer
                 as_web_user "wp oauth1 add  --name=\"$WORDPRESS_API_APPLICATION\" --description=\"$WORDPRESS_API_DESCRIPTION\"" > oauth_add_out
                 OAUTH_POST_ID=$(awk '/^ID:/ {print $2}' oauth_add_out)
-                if [ ! -n $CONSUMER_POST_ID ]; then
+                if [ ! -n $OAUTH_POST_ID ]; then
                     echo "could not determine post ID of oauth consumer."
                     cat oauth_add_out
                 else
