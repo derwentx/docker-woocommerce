@@ -49,6 +49,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
             : "${WORDPRESS_ADMIN_EMAIL:=admin@example.com}"
             : "${WORDPRESS_API_APPLICATION:=API Test Application}"
             : "${WORDPRESS_API_DESCRIPTION:=Test key for Testing the WP API}"
+            : "${WOOCOMMERCE_TEST_DATA_URL:=https://raw.githubusercontent.com/woocommerce/woocommerce/master/sample-data/sample_products.xml}"
             : "${SHELL:=/bin/sh}"
 
             as_web_user() {
@@ -120,7 +121,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 
             if [ -n "$WOOCOMMERCE_TEST_DATA" ] && [ ! -f "sample_products.xml" ]; then
                 as_web_user "wp plugin install wordpress-importer --activate"
-                as_web_user "curl -OL https://raw.githubusercontent.com/woocommerce/woocommerce/master/sample-data/sample_products.xml"
+                as_web_user "curl -L \"$WOOCOMMERCE_TEST_DATA_URL\" -o sample_products.xml"
                 as_web_user "wp import sample_products.xml --authors=create"
             fi
         fi
