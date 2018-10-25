@@ -78,7 +78,7 @@ Wraps https://hub.docker.com/_/wordpress/
 
 As well as these:
 
--  `-e WORDPRESS_SITE_URL=...`  Sets the site URL when creating the site.
+- `-e WORDPRESS_SITE_URL=...`  Sets the site URL when creating the site.
 - `-e WORDPRESS_SITE_TITLE=...` Sets the site title when creating the site.
 - `-e WORDPRESS_ADMIN_USER=...` Sets the admin username when creating the site.
 - `-e WORDPRESS_ADMIN_PASSWORD=...` Sets the admin password when creating the site.
@@ -94,3 +94,5 @@ As well as these:
 - `-e WOOCOMMERCE_TEST_DATA_URL=...` Override default WooCommerce XML test data URL
 - `-e WOOCOMMERCE_CONSUMER_KEY=...` Creates a WooCommerce API consumer with this key if $WOOCOMMERCE_CONSUMER_SECRET is also set
 - `-e WOOCOMMERCE_CONSUMER_SECRET=...` Creates a WooCommerce API consumer with this secret if $WOOCOMMERCE_CONSUMER_KEY is also set
+
+Example compose file: https://raw.githubusercontent.com/derwentx/wp-api-python/master/docker-compose.yml
